@@ -1,0 +1,107 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container my-3">
+    <div class="row border rounded justify-content-around gap-2">
+        <div class="col-lg-6">
+            <div class='item-intro p-1'>
+                <!-- item name -->
+                <p class="fs-4 fw-bold">{{ item.name }}</p>
+                <small class="text-muted"><i class="bi bi-pencil-square"></i> 商品敘述</small>
+                <!-- item intro -->
+                <p class="fs-6 p-1">
+                    {% for para in intro %}
+                        {{ para }}<br/>
+                    {% endfor %}
+                </p>
+                <!-- item price  -->
+                <small class="text-muted"><i class="bi bi-currency-dollar"></i> 預期價格</small>
+                <p class="fs-6 text-primary">{{item.price}} TWD</p>
+                <!-- status -->
+                <small class="text-muted"><i class="bi bi-clipboard-data"></i> 預期狀態</small>
+                <p class="fs-6 mb-3">{{ item.status.name }}</p>
+                <!-- location -->
+                <small class="text-muted"><i class="bi bi-pin-map"></i> 買家位置</small>
+                <p class="fs-6">{{ item.location.name }}</p>
+                <div class='item-uploader mb-3'>
+                    <small class="d-block text-muted mb-1"><i class="bi bi-person-fill"></i>買家</small>
+                    <img class="rounded-circle border user" src="{{ url_for('static', filename='users/'+item.uploader.image) }}">
+                    <p class='d-inline-block ms-2'><a href="{{ url_for('user_overview', user_name=item.uploader.name) }}">{{ item.uploader.name }}</a></p>
+                </div>
+                <!-- category -->
+                <small class="text-muted"><i class="bi bi-clipboard-data"></i> 分類</small>
+                <p class="fs-6 mb-3">{{ item.category1.name }}-{{ item.category2.name }}</p>
+                <!-- operation -->
+                <div>
+                    {% if item.uploader == current_user %}
+                        <a href="{{ url_for('edit_want', item_id = item.id) }}" class="btn btn-sm btn-secondary my-1">編輯</a>
+                        <button class="btn btn-sm btn-danger m-1" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal">刪除</button>
+                    {% else %}
+                        <a href="#" class="btn btn-sm btn-primary m-1">販售</a>
+                        <a href="#" class="btn btn-sm btn-primary m-1">追蹤</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">確定刪除商品?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                <div class="modal-body">
+                    此操作不可復原，點選確認後刪除。
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <form action="{{ url_for('delete_want', item_id = item.id) }}" method="post">
+                        <button type="submit" class="btn btn-danger">確認</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 d-flex justify-content-center align-items-center">
+            <div id="carouselImagesIndicators" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    {% if item.image2 or item.image3 %}
+                        <button type="button" data-bs-target="#carouselImagesIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    {% endif %}
+                    {% if item.image2 %}
+                        <button type="button" data-bs-target="#carouselImagesIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    {% endif %}
+                    {% if item.image3 %}
+                        <button type="button" data-bs-target="#carouselImagesIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    {% endif %}
+                </div>
+                <div class="carousel-inner">
+                    {% if item.image1 %}
+                        <div class="carousel-item active">
+                            <img src="{{ url_for('static', filename='items/'+item.image1) }}">
+                        </div>
+                    {% endif %}
+                    {% if item.image2 %}
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='items/'+item.image2) }}">
+                        </div>
+                    {% endif %}
+                    {% if item.image3 %}
+                        <div class="carousel-item">
+                            <img src="{{ url_for('static', filename='items/'+item.image3) }}">
+                        </div>
+                    {% endif %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselImagesIndicators" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselImagesIndicators" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

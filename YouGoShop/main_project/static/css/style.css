@@ -1,0 +1,42 @@
+/* td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+} */
+
+img{
+    width:100%;
+    height: 280px;
+    object-fit: contain;
+}
+img#preview_myPhoto{
+    height: 190px;
+}
+img.online-img{
+    height: 320px;
+}
+
+.select2-selection.select2-selection--single{
+    border: 1px solid #ced4da;
+}
+#select2-location-container{
+    font-size: .9rem;
+}
+.sell-title{
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+img.user{
+    width: 80px;
+    height: 80px;
+}
+img.user-info{
+    width: 100%;
+    height: 280px;
+}
+.carousel-item img{
+    height: 420px;
+}

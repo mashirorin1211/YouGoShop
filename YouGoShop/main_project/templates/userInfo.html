@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="row border align-items-center">
+            <div class="col-md-4">
+                <img src="{{ url_for('static', filename='users/'+user.image) }}" class="d-inline-block user-info">
+            </div>
+            <div class="col-md-8 p-3 text-left">
+                <small class="text-muted"><i class="bi bi-person-square"></i> 使用者名稱</small>
+                <h3 class="p-1">{{ user.name }}</h3>
+                <small class="text-muted"><i class="bi bi-journal-text"></i> 簡介</small>
+                <div>
+                    <p class="fs-6 p-1">
+                        {% for para in intro %}
+                        {{ para }}<br/>
+                        {% endfor %}
+                    </p>
+                    <small class="text-muted"><i class="bi bi-book"></i> 就讀學校</small>
+                    {% if user.school_id %}
+                        <p class="p-1">{{ user.school.name }}</p>
+                    {% else %}
+                        <p class="p-1 text-muted">尚未填寫</p>
+                    {% endif %}
+                    <small class="text-muted"><i class="bi bi-bookmark-heart-fill"></i> 喜好分類</small>
+                    {% if user.favor1_id %}
+                        <p class="p-1">{{ user.favor1.name }}-{{ user.favor2.name }}</p>
+                    {% else %}
+                        <p class="p-1 text-muted">尚未填寫</p>
+                    {% endif %}
+                    {% if current_user == user %}
+                        <a href="{{ url_for('edit_user') }}" class="btn btn-sm btn-primary">編輯</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

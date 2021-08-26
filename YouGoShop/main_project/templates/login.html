@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="container-lg">
+        <div class="text-center mb-3">
+            <h2 class="display-4 mt-3">登入</h2>
+            <p class="lead">歡迎回來，準備進行更多交易了嗎</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-8 col-md-6">
+                <form action="" method="POST">
+                    {{ form.hidden_tag() }}
+                    {{ form.username.label(class="form-label my-2") }}
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-person-circle"></i></span>
+                        {% if form.username.errors %}
+                            {{ form.username(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.username(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    {{ form.password.label(class="form-label my-2") }}
+                    <div class="input-group mb-4">
+                        <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="text-center">
+                        {{ form.submit(class="btn btn-secondary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

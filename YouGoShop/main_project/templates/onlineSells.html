@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="container">
+        <div class="text-center my-2">
+            <h2 class="fw-bold">{{ title }}</h2>
+        </div>
+        <!-- items -->
+        <div class="row my-2 g-3">
+            {% for onlineItem in onlineItems.items%}
+            <div class="col-md-6 col-xl-4 justify-content-center">
+                <div class="card border-secondary text-center">
+                    <div class="my-2">
+                        <img class="online-img" src="{{url_for('static', filename='/items/' + onlineItem.image1 )}}">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="sell-title">{{ onlineItem.name }}</h5>
+                        <p class="card-text">${{ onlineItem.price }} TWD</p>
+                        <a href="{{ url_for('sell_detail', sell_id=onlineItem.id) }}" class="btn btn-outline-primary">檢視</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+                
+        <!-- page -->
+        <div class="text-center my-3">
+            {% for page_num in onlineItems.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)%}
+                {% if page_num %}
+                    {% if onlineItems.page == page_num %}
+                        <a href="{{ url_for('online_sell', page=page_num) }}" class="btn btn-dark">{{ page_num }}</a>
+                    {% else %}
+                        <a href="{{ url_for('online_sell', page=page_num) }}" class="btn btn-outline-dark">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                    <i class="bi bi-three-dots"></i>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <!-- user image section -->
+                    <div class="text-center">
+                        <img id="preview_myPhoto" src="{{ image_file }}"/>
+                        {{ form.image.label(class="btn btn-sm btn-outline-primary my-2") }}
+                        {{ form.image(accept=".jpg, .jpeg, .png") }}
+                    </div>
+                    <!-- username field -->
+                    {{ form.username.label(class="form-label") }}
+                    <input class="form-control" type="text" disabled value="{{ user.name }}">
+                    <small class="d-block ms-2 text-secondary">使用者名稱不可更改</small>
+                    <!-- intro field -->
+                    {{ form.intro.label(class="form-label mt-2") }}
+                    {% if form.intro.errors %}
+                        {{ form.intro(class="form-control self-intro is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.intro.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.intro(class="form-control self-intro") }}
+                    {% endif %}
+                    <!-- select location -->
+                    {{ form.location.label(class="form-label mt-3") }}
+                    {{ form.location(class="form-control select-search") }}
+                    <!-- select category -->
+                    <label class="form-label mt-3">喜好分類</label>
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-sm-2">
+                            {{ form.category1(class="form-select form-select-sm") }}
+                        </div>
+                        <div class="col-md-6 mb-sm-2">
+                            {{ form.category2(class="form-select form-select-sm") }}
+                        </div>
+                    </div>
+                    <!-- select gender -->
+                    {{ form.gender.label(class="form-label mt-3") }}
+                    <div class="ms-2">
+                        {% for gen in form.gender %}
+                            <div class="form-check form-check-inline">
+                                {{ gen(class="form-check-input") }}
+                                {{ gen.label(class="form-check-label") }}
+                            </div>
+                        {% endfor %}  
+                    </div>
+                    <!-- submit button -->
+                    <div class="text-center my-3">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        let first_select = document.getElementById('category1');
+        let second_select = document.getElementById('category2');
+        function get_second_selection() {
+            first_id = first_select.value;
+            fetch('/category/'+first_id).then((response)=>{
+                response.json().then((data)=>{
+                    let optionHTML = '';
+                    for (let second of data.seconds) {
+                        optionHTML += '<option value="' + second.id +'">' + second.name + '</option>';
+                    }
+                    second_select.innerHTML = optionHTML;
+                });
+            });
+        }
+
+        window.onload = () => {
+            $('#category1').change(()=>get_second_selection());
+            $('#category2').one('focus', (e) => get_second_selection());
+            $('.select-search').select2({width: '100%'});
+            $('#image').change((e)=>{
+                const [file] = e.target.files
+                if (file) preview_myPhoto.src = URL.createObjectURL(file)
+            });
+        }
+    </script>
+{% endblock %}
