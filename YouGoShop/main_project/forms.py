@@ -58,3 +58,27 @@ class EditUserForm(FlaskForm):
     gender = RadioField("性別", coerce=int, validators=[Optional()], default=None)
     image = FileField("變更頭貼", validators=[FileAllowed(['jpg', 'jpeg', 'png'], message="只接受jpg, jpeg, png格式")], render_kw=image_style)
     submit = SubmitField('儲存')
+
+class TalkForm(FlaskForm):
+    name = StringField("主題", validators=[InputRequired(message='請輸入主題'),
+        Length(min=5, max=20, message='輸入長度限制為5~20個字')], render_kw=title_style)
+    intro = TextAreaField("內容", validators=[InputRequired(message='請輸入內容'),
+        Length(max=270, message='超過字數上限(250字)')], render_kw=description_style)
+    price = IntegerField(validators=[InputRequired(message='請輸入時間')])
+    image1 = FileField(validators=[FileAllowed(['jpg', 'jpeg', 'png'], message="只接受jpg, jpeg, png格式")], render_kw=image_style)
+    submit = SubmitField('送出')
+
+class TrackForm(FlaskForm):
+    user_id = TextAreaField("內容", validators=[InputRequired(message='請輸入內容'),
+        Length(max=270, message='超過字數上限(250字)')], render_kw=description_style)
+    track_id = TextAreaField("內容", validators=[InputRequired(message='請輸入內容'),
+        Length(max=270, message='超過字數上限(250字)')], render_kw=description_style)
+
+class PurchaseForm(FlaskForm):
+    name = StringField("名稱", validators=[InputRequired(message='請輸入名稱'),
+        Length(min=5, max=20, message='輸入長度限制為5~20個字')], render_kw=title_style)
+    buy_name = StringField("名稱", validators=[InputRequired(message='請輸入名稱'),
+        Length(min=5, max=20, message='輸入長度限制為5~20個字')], render_kw=title_style)
+    intro = TextAreaField("商品敘述", validators=[InputRequired(message='請輸入敘述'),
+        Length(max=270, message='超過字數上限(250字)')], render_kw=description_style)
+    price = IntegerField(validators=[InputRequired(message='請輸入價格')])

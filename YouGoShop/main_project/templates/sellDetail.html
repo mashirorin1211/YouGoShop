@@ -16,6 +16,14 @@
                 <!-- item price  -->
                 <small class="text-muted"><i class="bi bi-currency-dollar"></i>售價</small>
                 <p class="fs-6 text-primary">{{item.price}} TWD</p>
+                <!-- item price  -->
+                <small class="text-muted"><i class="bi bi-currency-dollar"></i>比比價 : </small>
+                <br>
+                <p class="fs-6 text-primary">飛比價格 : <a href="https://feebee.com.tw/s/{{ item.name }}">{{ item.name }}</a></p>
+                <p class="fs-6 text-primary">Find Price : <a href="https://www.findprice.com.tw/g/{{ item.name }}">{{ item.name }}</a></p>
+                <p class="fs-6 text-primary">B!gGo : <a href="https://biggo.com.tw/s/{{ item.name }}">{{ item.name }}</a></p>
+                <p class="fs-6 text-primary">比價撿便宜 : <a href="https://www.lbj.tw/BJ/Query.aspx?k={{ item.name }}">{{ item.name }}</a></p>
+                <p class="fs-6 text-primary">愛比價 : <a href="https://ibj.tw/product/{{ item.name }}">{{ item.name }}</a></p>
                 <!-- status -->
                 <small class="text-muted"><i class="bi bi-clipboard-data"></i> 狀態</small>
                 <p class="fs-6 mb-3">{{ item.status.name }}</p>
@@ -36,8 +44,9 @@
                         <a href="{{ url_for('edit_sell', item_id = item.id) }}" class="btn btn-sm btn-secondary my-1">編輯</a>
                         <button class="btn btn-sm btn-danger m-1" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal">刪除</button>
                     {% else %}
-                        <a href="#" class="btn btn-sm btn-primary m-1">購買</a>
-                        <button class="btn btn-sm btn-danger m-1">追蹤 <i class="bi bi-heart text-white"></i></a>
+                        <a href="{{ item.id }}/purchase" class="btn btn-sm btn-primary m-1">購買</a>
+                        <a href="{{ item.id }}/tracking" button class="btn btn-sm btn-danger m-1">追蹤<i class="bi bi-heart text-white"></i></a>
+                        <a href="{{ item.id }}/shopcart" class="btn btn-sm btn-primary m-1">加入購物車</a>
                     {% endif %}
                 </div>
             </div>

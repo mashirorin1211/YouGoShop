@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <main role="main" class="container">
+        <div class="align-items">
+            <div class="col-md-8">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="my-3">{{user.name}}購物車</h3>
+                </div>
+                {% if sells: %}
+                <table class="table table-hover text-center align-middle">
+                    <thead class="table-dark fw-bold">
+                        <tr>
+                            <th scope="col">名稱</th>
+                            <th scope="col">商品</th>
+                            <th scope="col">簡介</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sell in sells.items: %}
+                        <tr>
+                            <td>{{ sell.name }}</td>
+                            <td>{{ sell.price }} TWD</td>
+                            <td>{{ sell.intro }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="lead text-muted ms-2">目前沒有追蹤的商品</p>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="my-3">{{user.name}}正在追蹤商品的人</h3>
+                </div>
+                {% if wants: %}
+                <table class="table table-hover text-center align-middle">
+                    <thead class="table-dark fw-bold">
+                        <tr>
+                            <th scope="col">名稱</th>
+                            <th scope="col">商品</th>
+                            <th scope="col">簡介</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for want in wants.items: %}
+                        <tr>
+                            <td>{{ want.name }}</td>
+                            <td>{{ want.price }} TWD</td>
+                            <td>{{ want.intro }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="lead text-muted ms-2">目前沒有追蹤的商品</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

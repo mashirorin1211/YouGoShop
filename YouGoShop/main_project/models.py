@@ -42,7 +42,7 @@ class SellItem(db.Model):
     uploader_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sell_track = db.relationship('SellTrack', backref='item', lazy=True)
     sell_record = db.relationship('SellRecord', backref='item', lazy=True)
-    
+
 class WantItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
@@ -109,3 +109,89 @@ class ItemStatus(db.Model):
     name = db.Column(db.String(5), nullable=False)
     sell_stat = db.relationship('SellItem', backref='status', lazy=True)
     want_stat = db.relationship('WantItem', backref='status', lazy=True)
+
+class TalkItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    image1 = db.Column(db.String(25), nullable=False)
+    uploader_id = db.Column(db.String(50), nullable=False)
+
+class CartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    uploader_id = db.Column(db.String(50), nullable=False)
+
+class OrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    uploader_id = db.Column(db.String(50), nullable=False)
+
+class TrackItem(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True)
+    track_id = db.Column(db.Integer, primary_key=False)
+
+class PurchaseItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    buy_name = db.Column(db.String(50), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+
+class TrackingItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    buy_name = db.Column(db.String(50), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+
+class ShopCartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    status_id = db.Column(db.Integer, db.ForeignKey('item_status.id'), nullable=False)
+    image1 = db.Column(db.String(25), nullable=False)
+    image2 = db.Column(db.String(25))
+    image3 = db.Column(db.String(25))
+    condition = db.Column(db.Integer, nullable=False, default=0)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    location_id = db.Column(db.Integer, db.ForeignKey('university.id'), nullable=False)
+    category1_id = db.Column(db.Integer, db.ForeignKey('first_category.id'), nullable=False)
+    category2_id = db.Column(db.Integer, db.ForeignKey('second_category.id'), nullable=False)
+    who_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class TrackCartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    status_id = db.Column(db.Integer, db.ForeignKey('item_status.id'), nullable=False)
+    image1 = db.Column(db.String(25), nullable=False)
+    image2 = db.Column(db.String(25))
+    image3 = db.Column(db.String(25))
+    condition = db.Column(db.Integer, nullable=False, default=0)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    location_id = db.Column(db.Integer, db.ForeignKey('university.id'), nullable=False)
+    category1_id = db.Column(db.Integer, db.ForeignKey('first_category.id'), nullable=False)
+    category2_id = db.Column(db.Integer, db.ForeignKey('second_category.id'), nullable=False)
+    who_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class TrackWantItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), nullable=False)
+    intro = db.Column(db.String(500), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    status_id = db.Column(db.Integer, db.ForeignKey('item_status.id'), nullable=False)
+    image1 = db.Column(db.String(25), nullable=False)
+    image2 = db.Column(db.String(25))
+    image3 = db.Column(db.String(25))
+    condition = db.Column(db.Integer, nullable=False, default=0)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    location_id = db.Column(db.Integer, db.ForeignKey('university.id'), nullable=False)
+    category1_id = db.Column(db.Integer, db.ForeignKey('first_category.id'), nullable=False)
+    category2_id = db.Column(db.Integer, db.ForeignKey('second_category.id'), nullable=False)
+    who_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

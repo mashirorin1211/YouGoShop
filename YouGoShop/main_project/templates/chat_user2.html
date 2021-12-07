@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-10">
+            <h2 class="mb-3">{{ heading_label }}</h2>
+            <form action="" method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <!-- name field -->
+                {{ form.name.label(class="form-label") }}
+                {% if form.name.errors %}
+                    {{ form.name(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.name(class="form-control") }}
+                {% endif %}
+                <!-- intro field -->
+                {{ form.intro.label(class="form-label mt-2") }}
+                {% if form.intro.errors %}
+                    {{ form.intro(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.intro.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.intro(class="form-control") }}
+                {% endif %}
+                <!-- image section -->
+                <div class="row my-4">
+                    <!-- cover image -->
+                    <div class="col-lg-4 text-center mb-2">
+                        <span>{{ cover_label }}</span>
+                        <img id="preview_image1" src="{{ url_for('static', filename='items/noimage.jpg') }}"/>
+                        <label for="image1" class="btn btn-sm btn-outline-primary my-2">附件一</label>
+                        {{ form.image1(required='', accept=".jpg, .jpeg, .png") }}
+                    </div>
+                <!-- submit button -->
+                <div class="text-center my-2">
+                    {{ form.submit(class="btn btn-primary", value='發送意見') }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+        <!-- items -->
+        <div class="row my-2 g-3">
+            {% for onlineItem in onlineItems.items%}
+            <div class="col-md-6 col-xl-4 justify-content-center">
+                <div class="card border-secondary text-center">
+                    <div class="card-body">
+                        <h5 class="sell-title">主題 : {{ onlineItem.name }}</h5>
+                        <p class="card-text">內文 : {{ onlineItem.intro }}</p>
+                        <p class="card-text">Time : {{ onlineItem.price }}</p>
+                        <p class="card-text">Name : {{ onlineItem.uploader_id }}</p>
+                    <div class="my-2">
+                        <img class="online-img" src="{{url_for('static', filename='/items/' + onlineItem.image1 )}}">
+                    </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+<script>
+    $('#image1').change((e)=>{
+        const [file] = e.target.files
+        if (file) preview_image1.src = URL.createObjectURL(file)
+    });
+
+    window.onload = () => {
+        get_second_selection();
+        first_select.onchange = () => get_second_selection();
+        $('.select-search').select2({width: '100%'});
+    }
+</script>
+{% endblock %}

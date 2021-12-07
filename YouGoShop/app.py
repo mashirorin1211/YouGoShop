@@ -1,10 +1,10 @@
 from flask import request, render_template, url_for, redirect, flash, jsonify, abort
 from flask_login import login_user, logout_user, login_required, current_user
-
+import datetime
 from main_project import app, db, bcrypt
-from main_project.forms import RegisterForm, LoginForm, ItemForm, EditUserForm 
-from main_project.models import User, SellItem, WantItem, University, FirstCategory, SecondCategory
-
+from main_project.forms import RegisterForm, LoginForm, ItemForm, EditUserForm, TalkForm
+from main_project.models import User, SellItem, WantItem, University, FirstCategory, SecondCategory, TalkItem, TrackItem, PurchaseItem, TrackingItem, ShopCartItem, TrackCartItem, TrackWantItem
+import subprocess
 import os, secrets
 from PIL import Image
 
@@ -68,6 +68,19 @@ def logout():
 @login_required
 def upload():
     return render_template('upload.html', title="上傳商品")
+
+#追蹤
+@app.route('/tracking/<string:user_name>')
+def tracking(user_name):
+    user = User.query.filter_by(name = user_name).first()
+    if user is None:
+        abort(404)
+#    sells = sellItem.query.filter_by(who_id=user.id).order_by(sss.id.desc()).paginate(per_page=3, page=1)
+    sells = TrackCartItem.query.filter_by(who_id=user.id).order_by(TrackCartItem.id.desc()).paginate(per_page=3, page=1)
+#    wants = sellItem.query.filter_by(uploader_id=user.id).order_by(WantItem.id.desc()).paginate(per_page=3, page=1)
+    wants = ShopCartItem.query.filter_by(who_id=user.id).order_by(ShopCartItem.id.desc()).paginate(per_page=3, page=1)
+    want2s = TrackWantItem.query.filter_by(who_id=user.id).order_by(TrackWantItem.id.desc()).paginate(per_page=3, page=1)
+    return render_template('tracking.html', title=f"{user.name}的頁面", user=user, sells=sells, wants=wants, want2s=want2s)
 
 #儲存圖片
 def save_image(form_image, target_path):
@@ -383,5 +396,177 @@ def want_detail(want_id):
     intro = item.intro.split('\n')
     return render_template('wantDetail.html', user=user, item=item, intro=intro)
 
+@app.route('/chat_user', methods=['GET', 'POST'])
+@login_required
+def chat_user():
+    page_num = request.args.get('page', 1, type=int)
+    items = TalkItem.query.order_by(TalkItem.id.desc()).paginate(per_page=100, page=page_num)
+    form = TalkForm()
+#    get_form_selection(form)
+#    if form.validate_on_submit() and form.image1.data:
+    if form.image1.data:
+        datetime_dt = datetime.datetime.today()
+        datetime_str = datetime_dt.strftime("%Y/%m/%d %H:%M:%S")
+        img1 = save_image(form.image1.data, item_path)
+        new_item = TalkItem(name=form.name.data, intro=form.intro.data,
+            price=datetime_str, image1=img1,
+            uploader_id=current_user.name
+        )
+        db.session.add(new_item)
+        db.session.commit()
+        flash('成功上傳意見', 'success')
+        return redirect(url_for('index'))
+    return render_template('chat_user.html', title="發送意見", form=form, heading_label="聊聊天視窗",
+    price_label="發生時間" , cover_label="圖片附件" , onlineItems=items, target="onlineWant")
+
+@app.route('/onlineTalk')
+def online_Talk():
+#    user = User.query.get(current_user.id)
+#    item = SellItem.query.get_or_404(sell_id)
+#    intro = item.intro.split('\n')
+    page_num = request.args.get('page', 1, type=int)
+    items = TalkItem.query.order_by(TalkItem.id.desc()).paginate(per_page=100, page=page_num)
+    return render_template('onlineTalk.html', title="大家聊聊天", onlineItems=items, target="onlineWant")
+
+@app.route("/talkItem/<int:item_id>/delete", methods=['GET'])
+@login_required
+def delete_talk(item_id):
+    item = TalkItem.query.get_or_404(item_id)
+#    if uploader_id!=current_user.name:
+#        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('成功刪除留言', 'success')
+    page_num = request.args.get('page', 1, type=int)
+    items = TalkItem.query.order_by(TalkItem.id.desc()).paginate(per_page=100, page=page_num)
+    return render_template('onlineTalk.html', title="大家聊聊天", onlineItems=items, target="onlineWant")
+
+@app.route('/sellItem/<int:sell_id>/track')
+def sell_detail_track(sell_id):
+    user = User.query.get(current_user.id)
+    item = SellItem.query.get_or_404(sell_id)
+    intro = item.intro.split('\n')
+    new_item = TrackItem(track_id=current_user.id,user_id=sell_id)
+    db.session.add(new_item)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/sellItem/<int:item_id>/purchase', methods=['GET', 'POST'])
+@login_required
+def purchase_sell(item_id):
+    item = SellItem.query.get_or_404(item_id)
+#    if item.uploader == current_user:
+#        abort(403)
+    new_item = PurchaseItem(name = item.name , buy_name = current_user.name , intro = item.intro , price = item.price)
+    db.session.add(new_item)
+    db.session.commit()
+    flash('成功購買販售商品', 'success')
+    return redirect(url_for('sell_detail', sell_id=item.id))
+
+@app.route('/sellItem/<int:item_id>/tracking', methods=['GET', 'POST'])
+@login_required
+def tracking_sell(item_id):
+    item = SellItem.query.get_or_404(item_id)
+#    if item.uploader == current_user:
+#        abort(403)
+#    new_item = TrackingItem(name = item.name , buy_name = current_user.name , intro = item.intro , price = item.price)
+    new_item = TrackCartItem(name=item.name, intro=item.intro,
+        price=item.price, status_id=item.status_id, image1=item.image1, image2=item.image2, image3=item.image3,
+        location_id=item.location_id,category1_id=item.category1_id, category2_id=item.category2_id,
+        who_id=current_user.id
+    )
+    db.session.add(new_item)
+    db.session.commit()
+    flash('成功追蹤商品', 'success')
+    return redirect(url_for('sell_detail', sell_id=item.id))
+
+@app.route('/sellItem/<int:item_id>/shopcart', methods=['GET', 'POST'])
+@login_required
+def shopcart_sell(item_id):
+    item = SellItem.query.get_or_404(item_id)
+#    if item.uploader == current_user:
+#        abort(403)
+    new_item = ShopCartItem(name=item.name, intro=item.intro,
+        price=item.price, status_id=item.status_id, image1=item.image1, image2=item.image2, image3=item.image3,
+        location_id=item.location_id,category1_id=item.category1_id, category2_id=item.category2_id,
+        who_id=current_user.id
+    )
+    db.session.add(new_item)
+    db.session.commit()
+    flash('成功將商品加入購物車', 'success')
+    return redirect(url_for('sell_detail', sell_id=item.id))
+
+
+@app.route("/trackinga/<int:sell_id>/delete", methods=['GET'])
+@login_required
+def delete_track(sell_id):
+    item = TrackCartItem.query.get_or_404(sell_id)
+#    if uploader_id!=current_user.name:
+#        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('成功刪除購物車', 'success')
+    user = User.query.filter_by(name = current_user.name).first()
+#    user = str(current_user.name)
+    sells = TrackCartItem.query.filter_by(who_id=user.id).order_by(TrackCartItem.id.desc()).paginate(per_page=3, page=1)
+    wants = ShopCartItem.query.filter_by(who_id=user.id).order_by(ShopCartItem.id.desc()).paginate(per_page=3, page=1)
+    want2s = TrackWantItem.query.filter_by(who_id=user.id).order_by(TrackWantItem.id.desc()).paginate(per_page=3, page=1)
+    return render_template('tracking.html', title=f"{user.name}的頁面", user=user, sells=sells, wants=wants, want2s=want2s)
+#    flash('成功刪除購物車', 'success')
+#    page_num = request.args.get('page', 1, type=int)
+#    items = TalkItem.query.order_by(TalkItem.id.desc()).paginate(per_page=100, page=page_num)
+#    return render_template('onlineTalk.html', title="大家聊聊天", onlineItems=items, target="onlineWant")
+
+@app.route("/trackingb/<int:want_id>/delete", methods=['GET'])
+@login_required
+def delete_shopcart(want_id):
+    item = ShopCartItem.query.get_or_404(want_id)
+#    if uploader_id!=current_user.name:
+#        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('成功刪除正在追蹤', 'success')
+    user = User.query.filter_by(name = current_user.name).first()
+#    user = str(current_user.name)
+    sells = TrackCartItem.query.filter_by(who_id=user.id).order_by(TrackCartItem.id.desc()).paginate(per_page=3, page=1)
+    wants = ShopCartItem.query.filter_by(who_id=user.id).order_by(ShopCartItem.id.desc()).paginate(per_page=3, page=1)
+    want2s = TrackWantItem.query.filter_by(who_id=user.id).order_by(TrackWantItem.id.desc()).paginate(per_page=3, page=1)
+    return render_template('tracking.html', title=f"{user.name}的頁面", user=user, sells=sells, wants=wants, want2s=want2s)
+
+@app.route('/wantItem/<int:item_id>/wanttrack', methods=['GET', 'POST'])
+@login_required
+def tracking_want(item_id):
+    item = WantItem.query.get_or_404(item_id)
+#    if item.uploader == current_user:
+#        abort(403)
+#    new_item = TrackingItem(name = item.name , buy_name = current_user.name , intro = item.intro , price = item.price)
+    new_item = TrackWantItem(name=item.name, intro=item.intro,
+        price=item.price, status_id=item.status_id, image1=item.image1, image2=item.image2, image3=item.image3,
+        location_id=item.location_id,category1_id=item.category1_id, category2_id=item.category2_id,
+        who_id=current_user.id
+    )
+    db.session.add(new_item)
+    db.session.commit()
+    flash('成功追蹤商品', 'success')
+    return redirect(url_for('want_detail', want_id=item.id))
+
+@app.route("/trackingc/<int:want2_id>/delete", methods=['GET'])
+@login_required
+def delete_shopcart2(want2_id):
+    item = TrackWantItem.query.get_or_404(want2_id)
+#    if uploader_id!=current_user.name:
+#        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('成功刪除正在追蹤', 'success')
+    user = User.query.filter_by(name = current_user.name).first()
+#    user = str(current_user.name)
+    sells = TrackCartItem.query.filter_by(who_id=user.id).order_by(TrackCartItem.id.desc()).paginate(per_page=3, page=1)
+    wants = ShopCartItem.query.filter_by(who_id=user.id).order_by(ShopCartItem.id.desc()).paginate(per_page=3, page=1)
+    want2s = TrackWantItem.query.filter_by(who_id=user.id).order_by(TrackWantItem.id.desc()).paginate(per_page=3, page=1)
+    return render_template('tracking.html', title=f"{user.name}的頁面", user=user, sells=sells, wants=wants, want2s=want2s)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+#    os.system("sqlite_web -H 0.0.0.0 -x -p 8282 main_project/yougoshop.db&")
+    app.run(host='0.0.0.0',port=5002,debug=True)
+

@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <main role="main" class="container">
+        <div class="align-items">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="my-3">{{user.name}}的追蹤中</h3>
+                </div>
+                {% if sells: %}
+                <table class="table table-hover text-center align-middle">
+                    <thead class="table-dark fw-bold">
+                        <tr>
+                            <th scope="col">名稱</th>
+                            <th scope="col">商品</th>
+                            <th scope="col">簡介</th>
+                            <th scope="col">取消　　　　</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sell in sells.items: %}
+                        <tr>
+                            <td>{{ sell.name }}</td>
+                            <td>{{ sell.price }} TWD</td>
+                            <td>{{ sell.intro }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_track', sell_id=sell.id) }}" class="btn btn-sm btn-primary m-1">取消追蹤</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="lead text-muted ms-2">目前沒有追蹤商品</p>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="my-3">{{user.name}}的購物車</h3>
+                </div>
+                {% if wants: %}
+                <table class="table table-hover text-center align-middle">
+                    <thead class="table-dark fw-bold">
+                        <tr>
+                            <th scope="col">名稱</th>
+                            <th scope="col">商品</th>
+                            <th scope="col">簡介</th>
+                            <th scope="col">取消　　　　</th>
+                    </thead>
+                    <tbody>
+                        {% for want in wants.items: %}
+                        <tr>
+                            <td>{{ want.name }}</td>
+                            <td>{{ want.price }} TWD</td>
+                            <td>{{ want.intro }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_shopcart', want_id=want.id) }}" class="btn btn-sm btn-primary m-1">取消購物</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="lead text-muted ms-2">目前購物車沒有商品</p>
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="my-3">{{user.name}}的追蹤徵求商品</h3>
+                </div>
+                {% if want2s: %}
+                <table class="table table-hover text-center align-middle">
+                    <thead class="table-dark fw-bold">
+                        <tr>
+                            <th scope="col">名稱</th>
+                            <th scope="col">商品</th>
+                            <th scope="col">簡介</th>
+                            <th scope="col">取消　　　　</th>
+                    </thead>
+                    <tbody>
+                        {% for want2 in want2s.items: %}
+                        <tr>
+                            <td>{{ want2.name }}</td>
+                            <td>{{ want2.price }} TWD</td>
+                            <td>{{ want2.intro }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_shopcart2', want2_id=want2.id) }}" class="btn btn-sm btn-primary m-1">取消追蹤</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p class="lead text-muted ms-2">目前沒有追蹤徵求商品</p>
+                {% endif %}
+        </div>
+    </main>
+{% endblock %}

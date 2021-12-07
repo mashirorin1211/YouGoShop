@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-10">
+            <h2 class="mb-3">{{ heading_label }}</h2>
+            <form action="" method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <!-- name field -->
+                {{ form.name.label(class="form-label") }}
+                {% if form.name.errors %}
+                    {{ form.name(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.name(class="form-control") }}
+                {% endif %}
+                <!-- intro field -->
+                {{ form.intro.label(class="form-label mt-2") }}
+                {% if form.intro.errors %}
+                    {{ form.intro(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.intro.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.intro(class="form-control") }}
+                {% endif %}
+                <div class="row align-items-center mt-1">
+                    <!-- price field -->
+                    <div class="col-md-6">
+                        <label for="price" class="form-label mt-3">{{ price_label }}</label>
+                        {{ form.price(class="form-control ms-2 w-50") }}
+                    </div>
+                    <!-- status field -->
+                    <div class="col-md-6">
+                        <label for="status" class="form-label mt-3">{{ stat_label }}</label>
+                        <div class="ms-2">
+                            {% for stat in form.status %}
+                                <div class="form-check form-check-inline">
+                                    {{ stat(class="form-check-input") }}
+                                    {{ stat.label(class="form-check-label") }}
+                                </div>
+                            {% endfor %}  
+                        </div>
+                    </div>
+                </div>
+                <!-- image section -->
+                <div class="row my-4">
+                    <!-- cover image -->
+                    <div class="col-lg-4 text-center mb-2">
+                        <span>{{ cover_label }}</span>
+                        <img id="preview_image1" src="{{ url_for('static', filename='items/noimage.jpg') }}"/>
+                        <label for="image1" class="btn btn-sm btn-outline-primary my-2">附件一</label>
+                        {{ form.image1(required='', accept=".jpg, .jpeg, .png") }}
+                    </div>
+                    <!-- second image -->
+                    <div class="col-lg-4 text-center mb-2">
+                        <span>{{ image2_label }}</span>
+                        <img id="preview_image2" src="{{ url_for('static', filename='items/noimage.jpg') }}"/>
+                        <label for="image2" class="btn btn-sm btn-outline-primary my-2">附件二</label>
+                        {{ form.image2(class="form-control form-control-sm mt-2", accept=".jpg, .jpeg, .png") }}
+                    </div>
+                    <!-- third image -->
+                    <div class="col-lg-4 text-center mb-2">
+                        <span>{{ image3_label }}</span>
+                        <img id="preview_image3" src="{{ url_for('static', filename='items/noimage.jpg') }}"/>
+                        <label for="image3" class="btn btn-sm btn-outline-primary my-2">附件三</label>
+                        {{ form.image3(class="form-control form-control-sm mt-2", accept=".jpg, .jpeg, .png") }}
+                    </div>
+                </div>
+                <!-- location field -->
+                {{ form.location.label(class="form-label") }}
+                {% if form.location.data == 0 %}
+                    {{ form.location(class="d-block select-search is-invalid") }}
+                    <div class="invalid-feedback text-center">
+                        <span>請選擇商品位置</span>
+                    </div>
+                {% else %}
+                    {{ form.location(class="d-block select-search") }}
+                {% endif %}
+                <!-- select category -->
+                <label class="form-label mt-3">商品分類</label>
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-sm-2">
+                        {% if form.category1.data == 0 %}
+                            {{ form.category1(class="form-select form-select-sm is-invalid") }}
+                            <div class="invalid-feedback text-center">
+                                <span>請選擇第一層分類</span>
+                            </div>
+                        {% else %}
+                            {{ form.category1(class="form-select form-select-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-sm-2">
+                        {% if form.category2.data == 0 %}
+                            {{ form.category2(class="form-select form-select-sm is-invalid") }}
+                            <div class="invalid-feedback text-center">
+                                <span>請選擇第二層分類</span>
+                            </div>
+                        {% else %}
+                            {{ form.category2(class="form-select form-select-sm") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- submit button -->
+                <div class="text-center my-2">
+                    {{ form.submit(class="btn btn-primary", value='發送意見') }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $('#image1').change((e)=>{
+        const [file] = e.target.files
+        if (file) preview_image1.src = URL.createObjectURL(file)
+    });
+    $('#image2').change((e)=>{
+        const [file] = e.target.files
+        if (file) preview_image2.src = URL.createObjectURL(file)
+    });
+    $('#image3').change((e)=>{
+        const [file] = e.target.files
+        if (file) preview_image3.src = URL.createObjectURL(file)
+    });
+    
+    let first_select = document.getElementById('category1');
+    let second_select = document.getElementById('category2');
+    function get_second_selection() {
+        first_id = first_select.value;
+        fetch('/category/'+first_id).then((response)=>{
+            response.json().then((data)=>{
+                let optionHTML = '';
+                for (let second of data.seconds) {
+                    optionHTML += '<option value="' + second.id +'">' + second.name + '</option>';
+                }
+                second_select.innerHTML = optionHTML;
+            })
+        });
+    }
+
+    window.onload = () => {
+        get_second_selection();
+        first_select.onchange = () => get_second_selection();
+        $('.select-search').select2({width: '100%'});
+    }
+</script>
+{% endblock %}
