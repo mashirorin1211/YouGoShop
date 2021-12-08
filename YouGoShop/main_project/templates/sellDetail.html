@@ -32,7 +32,7 @@
                 <p class="fs-6">{{ item.location.name }}</p>
                 <div class='item-uploader mb-3'>
                     <small class="d-block text-muted mb-1"><i class="bi bi-person-fill"></i>賣家</small>
-                    <img class="rounded-circle border user" src="{{ url_for('static', filename='users/'+item.uploader.image) }}">
+                    <img class="rounded-circle border user" src="{{ url_for('static', filename='users/'+item.uploader.image) }}"   width="200px" height="200px">
                     <p class='d-inline-block ms-2'><a href="{{ url_for('user_overview', user_name=item.uploader.name) }}">{{ item.uploader.name }}</a></p>
                 </div>
                 <!-- category -->
